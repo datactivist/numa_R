@@ -47,6 +47,11 @@ Ces slides en ligne : http://datactivi.st/numa_R/jour1.html
 Pad collaboratif : https://frama.link/numa_R
 
 ---
+class: center, middle
+
+![](./img/by-sa.svg)
+
+---
 class: inverse, center, middle
 
 ## Faisons connaissance
