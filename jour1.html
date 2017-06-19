@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Les essentiels de la data science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="NUMA x datactivi.st" />
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: inverse, center, middle
+background-image: url(./img/seurat.jpg)
+background-size: cover
+background-position: 50% 50%
+
+# Les essentiels de la data science
+## R : le couteau suisse des données
+
+&lt;/BR&gt;
+&lt;/BR&gt;
+&lt;/BR&gt;
+
+###  Joël Gombin, avec Timothée Gidoin
+&lt;img src="./img/Logo_DATACTIVIST_TW.png" height="100px" /&gt;
+
+.right[.footnote[&lt;a href='https://commons.wikimedia.org/wiki/File%3ASeurat-Gravelines-Annonciade.jpg'&gt;source&lt;/a&gt;]]
+
+
+---
+class: center, middle
+
+Retrouvez les matériaux sur https://github.com/datactivist/numa_R
+
+Ces slides en ligne : http://datactivi.st/numa_R/jour1.html
+
+Pad collaboratif : https://frama.link/numa_R
+
+---
+class: inverse, center, middle
+
+## Faisons connaissance
+
+https://frama.link/formationR
+
+???
+
+Recueillir les réponses, générer le dashboard et montrer et expliquer le code
+
+
+---
+## Les objectifs
+
+- Comprendre les possibilités offertes par R
+- Comprendre le pipeline de données
+- Savoir importer des données dans R
+- Comprendre la notion de tidy data
+- Savoir transformer ses données en tidy data
+
+---
+## Le data pipeline 
+
+&lt;img src="./img/data-science.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+???
+
+Présenter les étapes du data pipeline
+Divers outils, workflows fragmentés
+Variante de ce pipeline : celui de School of Data
+
+---
+## Le data pipeline 
+
+&lt;img src="./img/pipeline.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## One tool to rule them all
+
+- R a comme avantage d'être un langage de programmation (= potentiel illimité) pensé exprès pour la manipulation des données (= usabilité, flexibilité)
+
+- au fil du temps, devenu un "general purpose tool"
+
+- permet d'interfacer de nombreux outils plus spécialisés
+
+- une communauté très dynamique (free software)
+
+- une syntaxe de plus en plus facile
+
+- des progrès vers [des bouts de GUI](https://rstudio.github.io/rstudioaddins/)
+
+---
+## Se faire aider
+
+   * Un livre sur R : [R for Data Science](http://r4ds.had.co.nz) de G. Grolemund et H. Wickham 
+
+   * blogs : https://www.r-bloggers.com (des carnets hypothèses: https://quanti.hypotheses.org/, https://politbistro.hypotheses.org)
+
+   * des listes de diffusion thématiques (ex : [la liste quanti](mailto:quanti@groupes.renater.fr), semin-r@mnhn.fr, r-soc@groupes.renater.fr), des forums (http://forums.cirad.fr/logiciel-R/)
+
+   * un site de Q/R communautaires : http://stackoverflow.com/questions/tagged/r
+
+   * twitter avec le hashtag [#Rstats](https://twitter.com/search?q=%23rstats)
+
+   * les [meetup R](https://www.meetup.com/fr-FR/rparis/)
+
+---
+## Installation de R et Rstudio
+
+   * [Installation de R](https://cloud.r-project.org/)
+   
+   * Sous windows télécharger [R Tools](https://cran.r-project.org/bin/windows/Rtools/)
+   
+   * Sous MacOS X il faut probablement [installer les "command line tools" ou un compilateur gcc](https://github.com/kennethreitz/osx-gcc-installer) (pour pouvoir compiler des packages lorsque nécessaire)
+   
+   * Installer ensuite [Rstudio](https://www.rstudio.com/products/rstudio/download/preview/)
+
+---
+## Prise en main de Rstudio
+
+- raccourci pour exécuter une ligne de code : ctrl + entrée, pomme + entrée pour Mac
+
+---
+## Scripts, litterate programming, reproducible research
+
+- toujours travailler dans le cadre d'un "projet"
+
+- ne jamais travailler dans la console
+
+- écrire des scripts
+
+- mieux : mêler texte et code au moyen de [fichiers Rmd](http://rmarkdown.rstudio.com/)
+
+- versionage (git)
+
+- notebook
+
+- commentez ! (avec le #)
+
+
+```r
+# ceci est un commentaire
+```
+
+
+
+---
+## Installation du tidyverse
+
+* Le `tidyverse` (ou hadleyverse) opérationnalise le workflow. Suite de packages pensés pour fonctionner ensemble
+
+* La "glue" de ce package : le "pipe" `%&gt;%` (Ctrl/Cmd + shift + M)
+
+* Pour installer le tidyverse, entrez dans la console : `install.packages("tidyverse")` (ou via Rstudio)
+
+* `library(tidyverse)` =&gt; charge le package
+
+---
+class: inverse, center, middle
+
+# Importer des données
+
+---
+## En GUI ou en CLI
+
+- bouton "Import dataset"
+
+- en CLI : package `readr` pour le CSV, `haven` pour SPSS / SAS / Stata, `readxl` pour le XLS(X), `rio` pour (presque) tout le reste
+
+*Et vous, quel(s) format(s) de données utilisez-vous habituellement ?*
+
+---
+## Importez votre premier jeu de données !
+
+- chargement de package : `library(readr)` (ou `library(tidyverse)`)
+
+- Attention à l'assignation : 
+
+  `monjeudedonnees &lt;- read_csv("monfichier.csv")` 
+
+- Importons un jeu de données électoral : les résultats par commune du premier tour de l'élection présidentielle. Source : https://github.com/datactivist/presidentielle2017 
+
+---
+## Importez votre premier jeu de données !
+
+
+```r
+suppressPackageStartupMessages(library(tidyverse))
+pres2017T1_communes &lt;- read_csv("./data/Presidentielle_2017_Resultats_Communes_T1_clean.csv")
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   CodeInsee = col_character(),
+##   CodeDepartement = col_character(),
+##   Département = col_character(),
+##   Commune = col_character(),
+##   Inscrits = col_integer(),
+##   Abstentions = col_integer(),
+##   Votants = col_integer(),
+##   Blancs = col_integer(),
+##   Nuls = col_integer(),
+##   Exprimés = col_integer(),
+##   `LE PEN` = col_integer(),
+##   MÉLENCHON = col_integer(),
+##   MACRON = col_integer(),
+##   FILLON = col_integer(),
+##   LASSALLE = col_integer(),
+##   `DUPONT-AIGNAN` = col_integer(),
+##   HAMON = col_integer(),
+##   ASSELINEAU = col_integer(),
+##   POUTOU = col_integer(),
+##   ARTHAUD = col_integer()
+##   # ... with 1 more columns
+## )
+```
+
+```
+## See spec(...) for full column specifications.
+```
+
+## Importez votre premier jeu de données !
+
+Si besoin, ajuster l'import au moyen des arguments `col_types`, `locale` ou encore `na`
+
+
+```r
+pres2017T1_communes &lt;- read_csv("./data/Presidentielle_2017_Resultats_Communes_T1_clean.csv",
+                       na = "",
+                       col_types = cols(
+  .default = col_double(),
+  CodeInsee = col_character(),
+  CodeDepartement = col_character(),
+  Département = col_character(),
+  Commune = col_character(),
+  Inscrits = col_integer(),
+  Abstentions = col_integer(),
+  Votants = col_integer(),
+  Blancs = col_integer(),
+  Nuls = col_integer(),
+  Exprimés = col_integer(),
+  `LE PEN` = col_integer(),
+  MÉLENCHON = col_integer(),
+  MACRON = col_integer(),
+  FILLON = col_integer(),
+  LASSALLE = col_integer(),
+  `DUPONT-AIGNAN` = col_integer(),
+  HAMON = col_integer(),
+  ASSELINEAU = col_integer(),
+  POUTOU = col_integer(),
+  ARTHAUD = col_integer(),
+  CHEMINADE = col_integer()
+  )
+)
+```
+
+???
+
+Expliquer les types de variable
+
+---
+## La notion de fonction
+
+
+```r
+sum(1, 2, 3)
+```
+
+```
+## [1] 6
+```
+
+```r
+a &lt;- sum(1, 2, 3)
+
+a
+```
+
+```
+## [1] 6
+```
+
+
+---
+class: inverse, center, middle
+# Le tidyverse 
+
+---
+## La notion de tidy data
+
+&gt; “Happy families are all alike; every unhappy family is unhappy in its own way.” – Tolstoï
+
+&gt; “Tidy datasets are all alike, but every messy dataset is messy in its own way.” – Hadley Wickham
+
+- À chaque variable sa propre colonne
+
+- À chaque observation sa propre ligne
+
+- À chaque valeur sa propre cellule
+
+---
+## La notion de tidy data
+
+&lt;img src="./img/tidy-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## La notion de tidy data
+
+- À chaque observation sa propre ligne
+
+- À chaque variable sa colonne
+
+- À chaque valeur sa propre cellule &gt; 1 jeu de données par table, dite “tibble”
+
+---
+## Un exemple de untidy data
+
+https://www.data.gouv.fr/fr/datasets/election-presidentielle-des-23-avril-et-7-mai-2017-resultats-definitifs-du-1er-tour-par-communes/
+
+---
+## Préparer des tidy data
+
+- `dplyr` et `tidyr`
+
+- le pipe : `%&gt;%` (Ctrl/Cmd + shift + M)
+
+- les verbes : 
+  + `filter` (et `slice`)
+  + `arrange`
+  + `select` (et `rename`)
+  + `distinct`
+  + `mutate` 
+  + `group_by` 
+  + `summarise`
+  + `sample_n` / `sample_frac`
+
+- `stringr` peut utilement accompagner (manipulation de chaînes de caractères)
+
+
+---
+## Pivoter
+
+`gather` et `spread`
+
+&lt;img src="http://r4ds.had.co.nz/images/tidy-9.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+## Pivoter
+
+
+```r
+pres2017T1_communes_long &lt;- pres2017T1_communes %&gt;% 
+  select(- contains("_ins")) %&gt;%
+  select(- contains("_exp")) %&gt;%   
+  gather(candidat, voix, `LE PEN`:CHEMINADE)
+
+pres2017T1_communes_long
+```
+
+```
+## # A tibble: 390,456 x 15
+##    CodeInsee CodeDepartement Département                 Commune Inscrits
+##        &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;    &lt;int&gt;
+##  1     01001              01         Ain L'Abergement-Clémenciat      598
+##  2     01002              01         Ain   L'Abergement-de-Varey      209
+##  3     01004              01         Ain       Ambérieu-en-Bugey     8586
+##  4     01005              01         Ain     Ambérieux-en-Dombes     1172
+##  5     01006              01         Ain                 Ambléon       99
+##  6     01007              01         Ain                Ambronay     1880
+##  7     01008              01         Ain                Ambutrix      581
+##  8     01009              01         Ain        Andert-et-Condon      254
+##  9     01010              01         Ain               Anglefort      738
+## 10     01011              01         Ain                Apremont      275
+## # ... with 390,446 more rows, and 10 more variables: Abstentions &lt;int&gt;,
+## #   Votants &lt;int&gt;, Blancs &lt;int&gt;, Blancs_vot &lt;dbl&gt;, Nuls &lt;int&gt;,
+## #   Nuls_vot &lt;dbl&gt;, Exprimés &lt;int&gt;, Exprimés_vot &lt;dbl&gt;, candidat &lt;chr&gt;,
+## #   voix &lt;int&gt;
+```
+
+---
+## Modifier
+
+
+```r
+pres2017T1_communes_long &lt;- pres2017T1_communes_long %&gt;% 
+  mutate(ins = voix / Inscrits * 100) %&gt;% 
+  mutate(exp = voix / Exprimés * 100) %&gt;%
+  print
+```
+
+```
+## # A tibble: 390,456 x 17
+##    CodeInsee CodeDepartement Département                 Commune Inscrits
+##        &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;    &lt;int&gt;
+##  1     01001              01         Ain L'Abergement-Clémenciat      598
+##  2     01002              01         Ain   L'Abergement-de-Varey      209
+##  3     01004              01         Ain       Ambérieu-en-Bugey     8586
+##  4     01005              01         Ain     Ambérieux-en-Dombes     1172
+##  5     01006              01         Ain                 Ambléon       99
+##  6     01007              01         Ain                Ambronay     1880
+##  7     01008              01         Ain                Ambutrix      581
+##  8     01009              01         Ain        Andert-et-Condon      254
+##  9     01010              01         Ain               Anglefort      738
+## 10     01011              01         Ain                Apremont      275
+## # ... with 390,446 more rows, and 12 more variables: Abstentions &lt;int&gt;,
+## #   Votants &lt;int&gt;, Blancs &lt;int&gt;, Blancs_vot &lt;dbl&gt;, Nuls &lt;int&gt;,
+## #   Nuls_vot &lt;dbl&gt;, Exprimés &lt;int&gt;, Exprimés_vot &lt;dbl&gt;, candidat &lt;chr&gt;,
+## #   voix &lt;int&gt;, ins &lt;dbl&gt;, exp &lt;dbl&gt;
+```
+
+---
+## Pivoter
+
+
+```r
+pres2017T1_communes_long %&gt;% 
+  gather(metrique, valeur, voix:exp) 
+```
+
+```
+## # A tibble: 1,171,368 x 16
+##    CodeInsee CodeDepartement Département                 Commune Inscrits
+##        &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;    &lt;int&gt;
+##  1     01001              01         Ain L'Abergement-Clémenciat      598
+##  2     01002              01         Ain   L'Abergement-de-Varey      209
+##  3     01004              01         Ain       Ambérieu-en-Bugey     8586
+##  4     01005              01         Ain     Ambérieux-en-Dombes     1172
+##  5     01006              01         Ain                 Ambléon       99
+##  6     01007              01         Ain                Ambronay     1880
+##  7     01008              01         Ain                Ambutrix      581
+##  8     01009              01         Ain        Andert-et-Condon      254
+##  9     01010              01         Ain               Anglefort      738
+## 10     01011              01         Ain                Apremont      275
+## # ... with 1,171,358 more rows, and 11 more variables: Abstentions &lt;int&gt;,
+## #   Votants &lt;int&gt;, Blancs &lt;int&gt;, Blancs_vot &lt;dbl&gt;, Nuls &lt;int&gt;,
+## #   Nuls_vot &lt;dbl&gt;, Exprimés &lt;int&gt;, Exprimés_vot &lt;dbl&gt;, candidat &lt;chr&gt;,
+## #   metrique &lt;chr&gt;, valeur &lt;dbl&gt;
+```
+
+---
+## Pivoter
+
+
+```r
+pres2017T1_communes_long %&gt;% 
+  gather(metrique, valeur, voix:exp) %&gt;% 
+  unite(variable, candidat, metrique, sep = "_")
+```
+
+```
+## # A tibble: 1,171,368 x 15
+##    CodeInsee CodeDepartement Département                 Commune Inscrits
+##  *     &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;    &lt;int&gt;
+##  1     01001              01         Ain L'Abergement-Clémenciat      598
+##  2     01002              01         Ain   L'Abergement-de-Varey      209
+##  3     01004              01         Ain       Ambérieu-en-Bugey     8586
+##  4     01005              01         Ain     Ambérieux-en-Dombes     1172
+##  5     01006              01         Ain                 Ambléon       99
+##  6     01007              01         Ain                Ambronay     1880
+##  7     01008              01         Ain                Ambutrix      581
+##  8     01009              01         Ain        Andert-et-Condon      254
+##  9     01010              01         Ain               Anglefort      738
+## 10     01011              01         Ain                Apremont      275
+## # ... with 1,171,358 more rows, and 10 more variables: Abstentions &lt;int&gt;,
+## #   Votants &lt;int&gt;, Blancs &lt;int&gt;, Blancs_vot &lt;dbl&gt;, Nuls &lt;int&gt;,
+## #   Nuls_vot &lt;dbl&gt;, Exprimés &lt;int&gt;, Exprimés_vot &lt;dbl&gt;, variable &lt;chr&gt;,
+## #   valeur &lt;dbl&gt;
+```
+
+---
+## Pivoter
+
+
+```r
+pres2017T1_communes_long %&gt;% 
+  gather(metrique, valeur, voix:exp) %&gt;% 
+  unite(variable, candidat, metrique, sep = "_") %&gt;% 
+  spread(variable, valeur)
+```
+
+```
+## # A tibble: 35,496 x 46
+##    CodeInsee CodeDepartement Département                 Commune Inscrits
+##  *     &lt;chr&gt;           &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;    &lt;int&gt;
+##  1     01001              01         Ain L'Abergement-Clémenciat      598
+##  2     01002              01         Ain   L'Abergement-de-Varey      209
+##  3     01004              01         Ain       Ambérieu-en-Bugey     8586
+##  4     01005              01         Ain     Ambérieux-en-Dombes     1172
+##  5     01006              01         Ain                 Ambléon       99
+##  6     01007              01         Ain                Ambronay     1880
+##  7     01008              01         Ain                Ambutrix      581
+##  8     01009              01         Ain        Andert-et-Condon      254
+##  9     01010              01         Ain               Anglefort      738
+## 10     01011              01         Ain                Apremont      275
+## # ... with 35,486 more rows, and 41 more variables: Abstentions &lt;int&gt;,
+## #   Votants &lt;int&gt;, Blancs &lt;int&gt;, Blancs_vot &lt;dbl&gt;, Nuls &lt;int&gt;,
+## #   Nuls_vot &lt;dbl&gt;, Exprimés &lt;int&gt;, Exprimés_vot &lt;dbl&gt;, ARTHAUD_exp &lt;dbl&gt;,
+## #   ARTHAUD_ins &lt;dbl&gt;, ARTHAUD_voix &lt;dbl&gt;, ASSELINEAU_exp &lt;dbl&gt;,
+## #   ASSELINEAU_ins &lt;dbl&gt;, ASSELINEAU_voix &lt;dbl&gt;, CHEMINADE_exp &lt;dbl&gt;,
+## #   CHEMINADE_ins &lt;dbl&gt;, CHEMINADE_voix &lt;dbl&gt;, `DUPONT-AIGNAN_exp` &lt;dbl&gt;,
+## #   `DUPONT-AIGNAN_ins` &lt;dbl&gt;, `DUPONT-AIGNAN_voix` &lt;dbl&gt;,
+## #   FILLON_exp &lt;dbl&gt;, FILLON_ins &lt;dbl&gt;, FILLON_voix &lt;dbl&gt;,
+## #   HAMON_exp &lt;dbl&gt;, HAMON_ins &lt;dbl&gt;, HAMON_voix &lt;dbl&gt;,
+## #   LASSALLE_exp &lt;dbl&gt;, LASSALLE_ins &lt;dbl&gt;, LASSALLE_voix &lt;dbl&gt;, `LE
+## #   PEN_exp` &lt;dbl&gt;, `LE PEN_ins` &lt;dbl&gt;, `LE PEN_voix` &lt;dbl&gt;,
+## #   MACRON_exp &lt;dbl&gt;, MACRON_ins &lt;dbl&gt;, MACRON_voix &lt;dbl&gt;,
+## #   MÉLENCHON_exp &lt;dbl&gt;, MÉLENCHON_ins &lt;dbl&gt;, MÉLENCHON_voix &lt;dbl&gt;,
+## #   POUTOU_exp &lt;dbl&gt;, POUTOU_ins &lt;dbl&gt;, POUTOU_voix &lt;dbl&gt;
+```
+
+---
+
+class: inverse, center, middle
+
+## À vous !
+
+### Choisissez un jeu de données à importer et nettoyer
+
+
+---
+## Le data pipeline 
+
+&lt;img src="./img/pipeline.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, inverse
+
+## Évaluation
+
+## https://frama.link/eval_numa_R_1
+    </textarea>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

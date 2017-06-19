@@ -1,0 +1,393 @@
+---
+title: "Les essentiels de la data science"
+author: NUMA x datactivi.st
+output:
+  xaringan::moon_reader:
+    css: [default, assets/xaringan.css]
+    seal: FALSE
+    chakra: libs/remark-latest.min.js
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+class: inverse, center, middle
+background-image: url(./img/seurat.jpg)
+background-size: cover
+background-position: 50% 50%
+
+# Les essentiels de la data science
+## R : le couteau suisse des données
+
+</BR>
+</BR>
+</BR>
+
+###  Joël Gombin, avec Timothée Gidoin
+<img src="./img/Logo_DATACTIVIST_TW.png" height="100px" />
+
+.right[.footnote[<a href='https://commons.wikimedia.org/wiki/File%3ASeurat-Gravelines-Annonciade.jpg'>source</a>]]
+
+
+---
+class: center, middle
+
+Retrouvez les matériaux sur https://github.com/datactivist/numa_R
+
+Ces slides en ligne : http://datactivi.st/numa_R/jour1.html
+
+Pad collaboratif : https://frama.link/numa_R
+
+---
+class: inverse, center, middle
+
+## Faisons connaissance
+
+https://frama.link/formationR
+
+???
+
+Recueillir les réponses, générer le dashboard et montrer et expliquer le code
+
+
+---
+## Les objectifs
+
+- Comprendre les possibilités offertes par R
+- Comprendre le pipeline de données
+- Savoir importer des données dans R
+- Comprendre la notion de tidy data
+- Savoir transformer ses données en tidy data
+
+---
+## Le data pipeline 
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("./img/data-science.png")
+```
+
+???
+
+Présenter les étapes du data pipeline
+Divers outils, workflows fragmentés
+Variante de ce pipeline : celui de School of Data
+
+---
+## Le data pipeline 
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("./img/pipeline.png")
+```
+
+---
+## One tool to rule them all
+
+- R a comme avantage d'être un langage de programmation (= potentiel illimité) pensé exprès pour la manipulation des données (= usabilité, flexibilité)
+
+- au fil du temps, devenu un "general purpose tool"
+
+- permet d'interfacer de nombreux outils plus spécialisés
+
+- une communauté très dynamique (free software)
+
+- une syntaxe de plus en plus facile
+
+- des progrès vers [des bouts de GUI](https://rstudio.github.io/rstudioaddins/)
+
+---
+## Se faire aider
+
+   * Un livre sur R : [R for Data Science](http://r4ds.had.co.nz) de G. Grolemund et H. Wickham 
+
+   * blogs : https://www.r-bloggers.com (des carnets hypothèses: https://quanti.hypotheses.org/, https://politbistro.hypotheses.org)
+
+   * des listes de diffusion thématiques (ex : [la liste quanti](mailto:quanti@groupes.renater.fr), semin-r@mnhn.fr, r-soc@groupes.renater.fr), des forums (http://forums.cirad.fr/logiciel-R/)
+
+   * un site de Q/R communautaires : http://stackoverflow.com/questions/tagged/r
+
+   * twitter avec le hashtag [#Rstats](https://twitter.com/search?q=%23rstats)
+
+   * les [meetup R](https://www.meetup.com/fr-FR/rparis/)
+
+---
+## Installation de R et Rstudio
+
+   * [Installation de R](https://cloud.r-project.org/)
+   
+   * Sous windows télécharger [R Tools](https://cran.r-project.org/bin/windows/Rtools/)
+   
+   * Sous MacOS X il faut probablement [installer les "command line tools" ou un compilateur gcc](https://github.com/kennethreitz/osx-gcc-installer) (pour pouvoir compiler des packages lorsque nécessaire)
+   
+   * Installer ensuite [Rstudio](https://www.rstudio.com/products/rstudio/download/preview/)
+
+---
+## Prise en main de Rstudio
+
+- raccourci pour exécuter une ligne de code : ctrl + entrée, pomme + entrée pour Mac
+
+---
+## Scripts, litterate programming, reproducible research
+
+- toujours travailler dans le cadre d'un "projet"
+
+- ne jamais travailler dans la console
+
+- écrire des scripts
+
+- mieux : mêler texte et code au moyen de [fichiers Rmd](http://rmarkdown.rstudio.com/)
+
+- versionage (git)
+
+- notebook
+
+- commentez ! (avec le #)
+
+```{r}
+# ceci est un commentaire
+```
+
+
+
+---
+## Installation du tidyverse
+
+* Le `tidyverse` (ou hadleyverse) opérationnalise le workflow. Suite de packages pensés pour fonctionner ensemble
+
+* La "glue" de ce package : le "pipe" `%>%` (Ctrl/Cmd + shift + M)
+
+* Pour installer le tidyverse, entrez dans la console : `install.packages("tidyverse")` (ou via Rstudio)
+
+* `library(tidyverse)` => charge le package
+
+---
+class: inverse, center, middle
+
+# Importer des données
+
+---
+## En GUI ou en CLI
+
+- bouton "Import dataset"
+
+- en CLI : package `readr` pour le CSV, `haven` pour SPSS / SAS / Stata, `readxl` pour le XLS(X), `rio` pour (presque) tout le reste
+
+*Et vous, quel(s) format(s) de données utilisez-vous habituellement ?*
+
+---
+## Importez votre premier jeu de données !
+
+- chargement de package : `library(readr)` (ou `library(tidyverse)`)
+
+- Attention à l'assignation : 
+
+  `monjeudedonnees <- read_csv("monfichier.csv")` 
+
+- Importons un jeu de données électoral : les résultats par commune du premier tour de l'élection présidentielle. Source : https://github.com/datactivist/presidentielle2017 
+
+---
+## Importez votre premier jeu de données !
+
+```{r }
+suppressPackageStartupMessages(library(tidyverse))
+pres2017T1_communes <- read_csv("./data/Presidentielle_2017_Resultats_Communes_T1_clean.csv")
+
+```
+
+## Importez votre premier jeu de données !
+
+Si besoin, ajuster l'import au moyen des arguments `col_types`, `locale` ou encore `na`
+
+```{r}
+pres2017T1_communes <- read_csv("./data/Presidentielle_2017_Resultats_Communes_T1_clean.csv",
+                       na = "",
+                       col_types = cols(
+  .default = col_double(),
+  CodeInsee = col_character(),
+  CodeDepartement = col_character(),
+  Département = col_character(),
+  Commune = col_character(),
+  Inscrits = col_integer(),
+  Abstentions = col_integer(),
+  Votants = col_integer(),
+  Blancs = col_integer(),
+  Nuls = col_integer(),
+  Exprimés = col_integer(),
+  `LE PEN` = col_integer(),
+  MÉLENCHON = col_integer(),
+  MACRON = col_integer(),
+  FILLON = col_integer(),
+  LASSALLE = col_integer(),
+  `DUPONT-AIGNAN` = col_integer(),
+  HAMON = col_integer(),
+  ASSELINEAU = col_integer(),
+  POUTOU = col_integer(),
+  ARTHAUD = col_integer(),
+  CHEMINADE = col_integer()
+  )
+)
+```
+
+???
+
+Expliquer les types de variable
+
+---
+## La notion de fonction
+
+```{r}
+sum(1, 2, 3)
+
+a <- sum(1, 2, 3)
+
+a
+```
+
+
+---
+class: inverse, center, middle
+# Le tidyverse 
+
+---
+## La notion de tidy data
+
+> “Happy families are all alike; every unhappy family is unhappy in its own way.” – Tolstoï
+
+> “Tidy datasets are all alike, but every messy dataset is messy in its own way.” – Hadley Wickham
+
+- À chaque variable sa propre colonne
+
+- À chaque observation sa propre ligne
+
+- À chaque valeur sa propre cellule
+
+---
+## La notion de tidy data
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("./img/tidy-1.png")
+``` 
+
+---
+## La notion de tidy data
+
+- À chaque observation sa propre ligne
+
+- À chaque variable sa colonne
+
+- À chaque valeur sa propre cellule > 1 jeu de données par table, dite “tibble”
+
+---
+## Un exemple de untidy data
+
+https://www.data.gouv.fr/fr/datasets/election-presidentielle-des-23-avril-et-7-mai-2017-resultats-definitifs-du-1er-tour-par-communes/
+
+---
+## Préparer des tidy data
+
+- `dplyr` et `tidyr`
+
+- le pipe : `%>%` (Ctrl/Cmd + shift + M)
+
+- les verbes : 
+  + `filter` (et `slice`)
+  + `arrange`
+  + `select` (et `rename`)
+  + `distinct`
+  + `mutate` 
+  + `group_by` 
+  + `summarise`
+  + `sample_n` / `sample_frac`
+
+- `stringr` peut utilement accompagner (manipulation de chaînes de caractères)
+
+
+---
+## Pivoter
+
+`gather` et `spread`
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("http://r4ds.had.co.nz/images/tidy-9.png")
+```
+
+---
+## Pivoter
+
+```{r}
+
+pres2017T1_communes_long <- pres2017T1_communes %>% 
+  select(- contains("_ins")) %>%
+  select(- contains("_exp")) %>%   
+  gather(candidat, voix, `LE PEN`:CHEMINADE)
+
+pres2017T1_communes_long
+```
+
+---
+## Modifier
+
+```{r}
+pres2017T1_communes_long <- pres2017T1_communes_long %>% 
+  mutate(ins = voix / Inscrits * 100) %>% 
+  mutate(exp = voix / Exprimés * 100) %>%
+  print
+```
+
+---
+## Pivoter
+
+```{r}
+pres2017T1_communes_long %>% 
+  gather(metrique, valeur, voix:exp) 
+```
+
+---
+## Pivoter
+
+```{r}
+pres2017T1_communes_long %>% 
+  gather(metrique, valeur, voix:exp) %>% 
+  unite(variable, candidat, metrique, sep = "_")
+
+```
+
+---
+## Pivoter
+
+```{r}
+pres2017T1_communes_long %>% 
+  gather(metrique, valeur, voix:exp) %>% 
+  unite(variable, candidat, metrique, sep = "_") %>% 
+  spread(variable, valeur)
+```
+
+---
+
+class: inverse, center, middle
+
+## À vous !
+
+### Choisissez un jeu de données à importer et nettoyer
+
+
+---
+## Le data pipeline 
+
+```{r, echo = FALSE, out.width='90%', fig.align='center'}
+knitr::include_graphics("./img/pipeline.png")
+```
+
+---
+class: center, middle, inverse
+
+## Évaluation
+
+## https://frama.link/eval_numa_R_1
