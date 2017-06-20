@@ -1,0 +1,325 @@
+---
+title: "Les essentiels de la data science"
+author: NUMA x datactivi.st
+output:
+  xaringan::moon_reader:
+    css: [default, assets/xaringan.css]
+    seal: FALSE
+    chakra: libs/remark-latest.min.js
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+class: inverse, center, middle
+background-image: url(./img/seurat.jpg)
+background-size: cover
+background-position: 50% 50%
+
+# Les essentiels de la data science
+## R : le couteau suisse des données
+### Jour 2
+
+</BR>
+</BR>
+</BR>
+
+###  Joël Gombin, avec Timothée Gidoin
+<img src="./img/Logo_DATACTIVIST_TW.png" height="100px" />
+
+.right[.footnote[<a href='https://commons.wikimedia.org/wiki/File%3ASeurat-Gravelines-Annonciade.jpg'>source</a>]]
+
+
+---
+class: center, middle
+
+Retrouvez les matériaux sur https://github.com/datactivist/numa_R
+
+Ces slides en ligne : http://datactivi.st/numa_R/jour2.html
+
+Pad collaboratif : https://frama.link/numa_R
+
+---
+class: center, middle
+
+![](./img/by-sa.svg)
+
+---
+## Objectifs de la journée
+
+
+- solidifer les acquis d'hier (tidy et transform)
+
+- acquérir, préparer et malaxer des données "en conditions réelles"
+
+- découvrir la visualisation de données
+
+---
+## Exercices
+
+- Importer des données en CSV
+
+- sélectionner certaines lignes en fonction d'une condition logique
+
+- ajouter une nouvelle variable
+
+- agréger/résumer les données par groupe
+
+- trier le résultat
+
+- pivoter des données
+
+---
+## Recoder des données
+
+- `recode`
+
+- `case_when`
+
+---
+## Recoder des données
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+elections <- read_csv("data/Presidentielle_2017_Resultats_Communes_T1_clean.csv")
+```
+
+---
+## Recoder des données
+
+```{r}
+elections %>% 
+  mutate(region = case_when(CodeDepartement %in% c("75", "77", "78", "91", "92", "93", "94", "95") ~ "Ile-de-France",
+                            TRUE ~ "Province")) %>% 
+  glimpse
+```
+
+---
+## Fusionner des jeux de données
+
+- primary keys et foreign keys
+
+- `left_join`
+- `right_join`
+- `full_join`
+- `inner_join`
+- `semi_join`
+- `anti_join`
+
+---
+## Left join
+
+![](http://r4ds.had.co.nz/diagrams/join-setup.png)
+
+---
+## Left join
+
+![](http://r4ds.had.co.nz/diagrams/join-setup2.png)
+
+---
+## Inner join
+
+![](http://r4ds.had.co.nz/diagrams/join-inner.png)
+
+---
+## Outer join
+
+.reduite[.center[![](http://r4ds.had.co.nz/diagrams/join-outer.png)]]
+
+---
+## Semi join
+
+![](http://r4ds.had.co.nz/diagrams/join-semi.png)
+
+---
+## Anti join
+
+![](http://r4ds.had.co.nz/diagrams/join-anti.png)
+
+---
+## Exemple
+
+(source : https://www.insee.fr/fr/information/2114596)
+
+```{r}
+library(readxl)
+ZE2010 <- read_xls("./data/ZE2010 au 01-01-2017.xls", sheet = "Composition_communale", skip = 5)
+
+elections <- elections %>% 
+  left_join(ZE2010, by = c("CodeInsee" = "CODGEO")) %>% 
+  glimpse()
+```
+
+---
+## Exemple
+
+```{r}
+elections %>% 
+  group_by(ZE2010) %>% 
+  summarise_at(vars(Inscrits, Abstentions, Votants, Blancs, Nuls, Exprimés, `LE PEN`:CHEMINADE), funs(sum(.)))
+```
+
+---
+## Exemple
+
+```{r}
+elections %>% 
+  group_by(ZE2010) %>% 
+  summarise_at(vars(Inscrits, Abstentions, Votants, Blancs, Nuls, Exprimés, `LE PEN`:CHEMINADE), funs(sum(.))) %>% 
+  mutate_at(vars(`LE PEN`:CHEMINADE), funs(. / Inscrits * 100))
+```
+
+---
+## À ne pas confondre : binding
+
+Ici il s'agit de juxtaposer des jeux de données 
+
+- `bind_rows`
+- `bind_cols`
+
+---
+## Tips & tricks dplyr
+
+```{r}
+ZE2010 %>% 
+  group_by(LIBZE2010) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n))
+```
+
+---
+## Tips & tricks dplyr
+
+
+```{r}
+ZE2010 %>% 
+  count(LIBZE2010, sort = TRUE)
+```
+
+---
+## Tips & tricks dplyr
+
+Numéroter les communes par ordre décroissant de vote Le Pen dans le département
+
+```{r}
+elections %>% 
+  group_by(CodeDepartement) %>% 
+  arrange(desc(`LE PEN_exp`)) %>% 
+  mutate(numero = 1:n()) %>% 
+  ungroup %>% 
+  arrange(desc(`LE PEN_exp`)) %>% 
+  select(CodeInsee, Commune, Département, numero, `LE PEN_exp`)
+```
+
+---
+class: inverse, center, middle
+
+# Visualisation de données avec ggplot2
+
+---
+## Le panorama des systèmes graphiques de R
+
+- base graphics : mélange bas niveau/haut niveau, complexe, pas très cohérent, mais rapide et puissant
+
+- lattice : haut niveau, a une grammaire, plus très utilisé
+
+- ggplot2 : haut niveau, grammaire cohérente, très puissant, très largement utilisé et [imité](http://ggplot.yhathq.com/) 
+
+
+---
+## La notion de grammaire de visualisation
+
+- données
+
+- correspondances esthétiques (`aes`thetic mapping)
+
+- couches (`layer`) : `geom` et `stat`
+
+- échelles (`scale`)
+
+- un système de coordonnées (`coord`)
+
+- petits multiples (`facet`)
+
+- un thème (`theme`)
+
+---
+## Un premier exemple simple
+
+- choisir un jeu de données
+
+- faire des graphiques descriptifs (univariés)
+
+- faire des graphiques bivariés
+
+- changer les `aes`
+
+- changer les `geom`
+
+- changer les `theme`
+
+---
+## Les principaux `geom`
+
+- `geom_point`
+
+- `geom_line`
+
+- `geom_text`
+
+- `geom_quantile`
+
+- `geom_histogram`
+
+- `geom_density`
+
+- `geom_smooth`
+
+- `geom_bar`
+
+- et même `geom_map` (et `geom_sf` en conjonction avec le package `sf`)
+
+---
+## Les principaux `aes`thetics
+
+- `x`
+
+- `y`
+
+- `colour`
+
+- `fill`
+
+- `size`
+
+- line width `lwd`
+
+- line type `lty`
+
+---
+class: inverse, center, middle
+
+# Point sur les acquis, les projets, les besoins
+
+---
+class: inverse, center, middle
+
+# Évaluation
+
+https://frama.link/eval_numa_R_2
+
+---
+class: inverse, center, middle
+
+
+# À votre disposition !
+
+joel@datactivi.st

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Les essentiels de la data science</title>
+    <meta charset="utf-8">
+    <meta name="author" content="NUMA x datactivi.st" />
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+class: inverse, center, middle
+background-image: url(./img/seurat.jpg)
+background-size: cover
+background-position: 50% 50%
+
+# Les essentiels de la data science
+## R : le couteau suisse des données
+### Jour 2
+
+&lt;/BR&gt;
+&lt;/BR&gt;
+&lt;/BR&gt;
+
+###  Joël Gombin, avec Timothée Gidoin
+&lt;img src="./img/Logo_DATACTIVIST_TW.png" height="100px" /&gt;
+
+.right[.footnote[&lt;a href='https://commons.wikimedia.org/wiki/File%3ASeurat-Gravelines-Annonciade.jpg'&gt;source&lt;/a&gt;]]
+
+
+---
+class: center, middle
+
+Retrouvez les matériaux sur https://github.com/datactivist/numa_R
+
+Ces slides en ligne : http://datactivi.st/numa_R/jour2.html
+
+Pad collaboratif : https://frama.link/numa_R
+
+---
+class: center, middle
+
+![](./img/by-sa.svg)
+
+---
+## Objectifs de la journée
+
+
+- solidifer les acquis d'hier (tidy et transform)
+
+- acquérir, préparer et malaxer des données "en conditions réelles"
+
+- découvrir la visualisation de données
+
+---
+## Exercices
+
+- Importer des données en CSV
+
+- sélectionner certaines lignes en fonction d'une condition logique
+
+- ajouter une nouvelle variable
+
+- agréger/résumer les données par groupe
+
+- trier le résultat
+
+- pivoter des données
+
+---
+## Recoder des données
+
+- `recode`
+
+- `case_when`
+
+---
+## Recoder des données
+
+
+```r
+suppressPackageStartupMessages(library(tidyverse))
+elections &lt;- read_csv("data/Presidentielle_2017_Resultats_Communes_T1_clean.csv")
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   CodeInsee = col_character(),
+##   CodeDepartement = col_character(),
+##   Département = col_character(),
+##   Commune = col_character(),
+##   Inscrits = col_integer(),
+##   Abstentions = col_integer(),
+##   Votants = col_integer(),
+##   Blancs = col_integer(),
+##   Nuls = col_integer(),
+##   Exprimés = col_integer(),
+##   `LE PEN` = col_integer(),
+##   MÉLENCHON = col_integer(),
+##   MACRON = col_integer(),
+##   FILLON = col_integer(),
+##   LASSALLE = col_integer(),
+##   `DUPONT-AIGNAN` = col_integer(),
+##   HAMON = col_integer(),
+##   ASSELINEAU = col_integer(),
+##   POUTOU = col_integer(),
+##   ARTHAUD = col_integer()
+##   # ... with 1 more columns
+## )
+```
+
+```
+## See spec(...) for full column specifications.
+```
+
+---
+## Recoder des données
+
+
+```r
+elections %&gt;% 
+  mutate(region = case_when(CodeDepartement %in% c("75", "77", "78", "91", "92", "93", "94", "95") ~ "Ile-de-France",
+                            TRUE ~ "Province")) %&gt;% 
+  glimpse
+```
+
+```
+## Observations: 35,496
+## Variables: 52
+## $ CodeInsee         &lt;chr&gt; "01001", "01002", "01004", "01005", "01006",...
+## $ CodeDepartement   &lt;chr&gt; "01", "01", "01", "01", "01", "01", "01", "0...
+## $ Département       &lt;chr&gt; "Ain", "Ain", "Ain", "Ain", "Ain", "Ain", "A...
+## $ Commune           &lt;chr&gt; "L'Abergement-Clémenciat", "L'Abergement-de-...
+## $ Inscrits          &lt;int&gt; 598, 209, 8586, 1172, 99, 1880, 581, 254, 73...
+## $ Abstentions       &lt;int&gt; 92, 25, 1962, 215, 20, 268, 91, 41, 136, 43,...
+## $ Abstentions_ins   &lt;dbl&gt; 15.38462, 11.96172, 22.85115, 18.34471, 20.2...
+## $ Votants           &lt;int&gt; 506, 184, 6624, 957, 79, 1612, 490, 213, 602...
+## $ Votants_ins       &lt;dbl&gt; 84.61538, 88.03828, 77.14885, 81.65529, 79.7...
+## $ Blancs            &lt;int&gt; 2, 6, 114, 21, 2, 53, 12, 1, 2, 6, 0, 2, 33,...
+## $ Blancs_ins        &lt;dbl&gt; 0.3344482, 2.8708134, 1.3277428, 1.7918089, ...
+## $ Blancs_vot        &lt;dbl&gt; 0.3952569, 3.2608696, 1.7210145, 2.1943574, ...
+## $ Nuls              &lt;int&gt; 9, 2, 58, 3, 0, 11, 5, 3, 11, 2, 7, 0, 12, 8...
+## $ Nuls_ins          &lt;dbl&gt; 1.5050167, 0.9569378, 0.6755183, 0.2559727, ...
+## $ Nuls_vot          &lt;dbl&gt; 1.7786561, 1.0869565, 0.8756039, 0.3134796, ...
+## $ Exprimés          &lt;int&gt; 495, 176, 6452, 933, 77, 1548, 473, 209, 589...
+## $ Exprimés_ins      &lt;dbl&gt; 82.77592, 84.21053, 75.14559, 79.60751, 77.7...
+## $ Exprimés_vot      &lt;dbl&gt; 97.82609, 95.65217, 97.40338, 97.49216, 97.4...
+## $ LE PEN            &lt;int&gt; 126, 48, 1667, 306, 18, 458, 135, 40, 207, 6...
+## $ MÉLENCHON         &lt;int&gt; 59, 33, 1412, 126, 19, 296, 89, 39, 103, 30,...
+## $ MACRON            &lt;int&gt; 119, 37, 1332, 191, 15, 348, 95, 55, 110, 49...
+## $ FILLON            &lt;int&gt; 110, 34, 1084, 197, 14, 233, 84, 44, 83, 46,...
+## $ LASSALLE          &lt;int&gt; 2, 0, 60, 6, 1, 13, 3, 8, 14, 4, 2, 0, 21, 7...
+## $ DUPONT-AIGNAN     &lt;int&gt; 34, 6, 346, 45, 4, 80, 28, 6, 33, 9, 10, 3, ...
+## $ HAMON             &lt;int&gt; 29, 13, 344, 37, 3, 82, 23, 8, 20, 13, 10, 1...
+## $ ASSELINEAU        &lt;int&gt; 6, 1, 71, 10, 0, 11, 2, 6, 10, 1, 0, 2, 23, ...
+## $ POUTOU            &lt;int&gt; 4, 2, 91, 10, 2, 17, 8, 3, 5, 4, 2, 2, 15, 4...
+## $ ARTHAUD           &lt;int&gt; 4, 2, 40, 5, 1, 9, 3, 0, 3, 4, 2, 2, 9, 3, 5...
+## $ CHEMINADE         &lt;int&gt; 2, 0, 5, 0, 0, 1, 3, 0, 1, 0, 1, 0, 2, 2, 1,...
+## $ LE PEN_ins        &lt;dbl&gt; 21.07023, 22.96651, 19.41533, 26.10922, 18.1...
+## $ MÉLENCHON_ins     &lt;dbl&gt; 9.866221, 15.789474, 16.445376, 10.750853, 1...
+## $ MACRON_ins        &lt;dbl&gt; 19.899666, 17.703349, 15.513627, 16.296928, ...
+## $ FILLON_ins        &lt;dbl&gt; 18.394649, 16.267943, 12.625204, 16.808874, ...
+## $ LASSALLE_ins      &lt;dbl&gt; 0.3344482, 0.0000000, 0.6988120, 0.5119454, ...
+## $ DUPONT-AIGNAN_ins &lt;dbl&gt; 5.685619, 2.870813, 4.029816, 3.839590, 4.04...
+## $ HAMON_ins         &lt;dbl&gt; 4.8494983, 6.2200957, 4.0065222, 3.1569966, ...
+## $ ASSELINEAU_ins    &lt;dbl&gt; 1.0033445, 0.4784689, 0.8269276, 0.8532423, ...
+## $ POUTOU_ins        &lt;dbl&gt; 0.6688963, 0.9569378, 1.0598649, 0.8532423, ...
+## $ ARTHAUD_ins       &lt;dbl&gt; 0.6688963, 0.9569378, 0.4658747, 0.4266212, ...
+## $ CHEMINADE_ins     &lt;dbl&gt; 0.33444816, 0.00000000, 0.05823433, 0.000000...
+## $ LE PEN_exp        &lt;dbl&gt; 25.45455, 27.27273, 25.83695, 32.79743, 23.3...
+## $ MÉLENCHON_exp     &lt;dbl&gt; 11.91919, 18.75000, 21.88469, 13.50482, 24.6...
+## $ MACRON_exp        &lt;dbl&gt; 24.040404, 21.022727, 20.644761, 20.471597, ...
+## $ FILLON_exp        &lt;dbl&gt; 22.22222, 19.31818, 16.80099, 21.11468, 18.1...
+## $ LASSALLE_exp      &lt;dbl&gt; 0.4040404, 0.0000000, 0.9299442, 0.6430868, ...
+## $ DUPONT-AIGNAN_exp &lt;dbl&gt; 6.868687, 3.409091, 5.362678, 4.823151, 5.19...
+## $ HAMON_exp         &lt;dbl&gt; 5.8585859, 7.3863636, 5.3316801, 3.9657020, ...
+## $ ASSELINEAU_exp    &lt;dbl&gt; 1.2121212, 0.5681818, 1.1004340, 1.0718114, ...
+## $ POUTOU_exp        &lt;dbl&gt; 0.8080808, 1.1363636, 1.4104154, 1.0718114, ...
+## $ ARTHAUD_exp       &lt;dbl&gt; 0.8080808, 1.1363636, 0.6199628, 0.5359057, ...
+## $ CHEMINADE_exp     &lt;dbl&gt; 0.40404040, 0.00000000, 0.07749535, 0.000000...
+## $ region            &lt;chr&gt; "Province", "Province", "Province", "Provinc...
+```
+
+---
+## Fusionner des jeux de données
+
+- primary keys et foreign keys
+
+- `left_join`
+- `right_join`
+- `full_join`
+- `inner_join`
+- `semi_join`
+- `anti_join`
+
+---
+## Left join
+
+![](http://r4ds.had.co.nz/diagrams/join-setup.png)
+
+---
+## Left join
+
+![](http://r4ds.had.co.nz/diagrams/join-setup2.png)
+
+---
+## Inner join
+
+![](http://r4ds.had.co.nz/diagrams/join-inner.png)
+
+---
+## Outer join
+
+.reduite[.center[![](http://r4ds.had.co.nz/diagrams/join-outer.png)]]
+
+---
+## Semi join
+
+![](http://r4ds.had.co.nz/diagrams/join-semi.png)
+
+---
+## Anti join
+
+![](http://r4ds.had.co.nz/diagrams/join-anti.png)
+
+---
+## Exemple
+
+(source : https://www.insee.fr/fr/information/2114596)
+
+
+```r
+library(readxl)
+ZE2010 &lt;- read_xls("./data/ZE2010 au 01-01-2017.xls", sheet = "Composition_communale", skip = 5)
+
+elections &lt;- elections %&gt;% 
+  left_join(ZE2010, by = c("CodeInsee" = "CODGEO")) %&gt;% 
+  glimpse()
+```
+
+```
+## Observations: 35,496
+## Variables: 56
+## $ CodeInsee         &lt;chr&gt; "01001", "01002", "01004", "01005", "01006",...
+## $ CodeDepartement   &lt;chr&gt; "01", "01", "01", "01", "01", "01", "01", "0...
+## $ Département       &lt;chr&gt; "Ain", "Ain", "Ain", "Ain", "Ain", "Ain", "A...
+## $ Commune           &lt;chr&gt; "L'Abergement-Clémenciat", "L'Abergement-de-...
+## $ Inscrits          &lt;int&gt; 598, 209, 8586, 1172, 99, 1880, 581, 254, 73...
+## $ Abstentions       &lt;int&gt; 92, 25, 1962, 215, 20, 268, 91, 41, 136, 43,...
+## $ Abstentions_ins   &lt;dbl&gt; 15.38462, 11.96172, 22.85115, 18.34471, 20.2...
+## $ Votants           &lt;int&gt; 506, 184, 6624, 957, 79, 1612, 490, 213, 602...
+## $ Votants_ins       &lt;dbl&gt; 84.61538, 88.03828, 77.14885, 81.65529, 79.7...
+## $ Blancs            &lt;int&gt; 2, 6, 114, 21, 2, 53, 12, 1, 2, 6, 0, 2, 33,...
+## $ Blancs_ins        &lt;dbl&gt; 0.3344482, 2.8708134, 1.3277428, 1.7918089, ...
+## $ Blancs_vot        &lt;dbl&gt; 0.3952569, 3.2608696, 1.7210145, 2.1943574, ...
+## $ Nuls              &lt;int&gt; 9, 2, 58, 3, 0, 11, 5, 3, 11, 2, 7, 0, 12, 8...
+## $ Nuls_ins          &lt;dbl&gt; 1.5050167, 0.9569378, 0.6755183, 0.2559727, ...
+## $ Nuls_vot          &lt;dbl&gt; 1.7786561, 1.0869565, 0.8756039, 0.3134796, ...
+## $ Exprimés          &lt;int&gt; 495, 176, 6452, 933, 77, 1548, 473, 209, 589...
+## $ Exprimés_ins      &lt;dbl&gt; 82.77592, 84.21053, 75.14559, 79.60751, 77.7...
+## $ Exprimés_vot      &lt;dbl&gt; 97.82609, 95.65217, 97.40338, 97.49216, 97.4...
+## $ LE PEN            &lt;int&gt; 126, 48, 1667, 306, 18, 458, 135, 40, 207, 6...
+## $ MÉLENCHON         &lt;int&gt; 59, 33, 1412, 126, 19, 296, 89, 39, 103, 30,...
+## $ MACRON            &lt;int&gt; 119, 37, 1332, 191, 15, 348, 95, 55, 110, 49...
+## $ FILLON            &lt;int&gt; 110, 34, 1084, 197, 14, 233, 84, 44, 83, 46,...
+## $ LASSALLE          &lt;int&gt; 2, 0, 60, 6, 1, 13, 3, 8, 14, 4, 2, 0, 21, 7...
+## $ DUPONT-AIGNAN     &lt;int&gt; 34, 6, 346, 45, 4, 80, 28, 6, 33, 9, 10, 3, ...
+## $ HAMON             &lt;int&gt; 29, 13, 344, 37, 3, 82, 23, 8, 20, 13, 10, 1...
+## $ ASSELINEAU        &lt;int&gt; 6, 1, 71, 10, 0, 11, 2, 6, 10, 1, 0, 2, 23, ...
+## $ POUTOU            &lt;int&gt; 4, 2, 91, 10, 2, 17, 8, 3, 5, 4, 2, 2, 15, 4...
+## $ ARTHAUD           &lt;int&gt; 4, 2, 40, 5, 1, 9, 3, 0, 3, 4, 2, 2, 9, 3, 5...
+## $ CHEMINADE         &lt;int&gt; 2, 0, 5, 0, 0, 1, 3, 0, 1, 0, 1, 0, 2, 2, 1,...
+## $ LE PEN_ins        &lt;dbl&gt; 21.07023, 22.96651, 19.41533, 26.10922, 18.1...
+## $ MÉLENCHON_ins     &lt;dbl&gt; 9.866221, 15.789474, 16.445376, 10.750853, 1...
+## $ MACRON_ins        &lt;dbl&gt; 19.899666, 17.703349, 15.513627, 16.296928, ...
+## $ FILLON_ins        &lt;dbl&gt; 18.394649, 16.267943, 12.625204, 16.808874, ...
+## $ LASSALLE_ins      &lt;dbl&gt; 0.3344482, 0.0000000, 0.6988120, 0.5119454, ...
+## $ DUPONT-AIGNAN_ins &lt;dbl&gt; 5.685619, 2.870813, 4.029816, 3.839590, 4.04...
+## $ HAMON_ins         &lt;dbl&gt; 4.8494983, 6.2200957, 4.0065222, 3.1569966, ...
+## $ ASSELINEAU_ins    &lt;dbl&gt; 1.0033445, 0.4784689, 0.8269276, 0.8532423, ...
+## $ POUTOU_ins        &lt;dbl&gt; 0.6688963, 0.9569378, 1.0598649, 0.8532423, ...
+## $ ARTHAUD_ins       &lt;dbl&gt; 0.6688963, 0.9569378, 0.4658747, 0.4266212, ...
+## $ CHEMINADE_ins     &lt;dbl&gt; 0.33444816, 0.00000000, 0.05823433, 0.000000...
+## $ LE PEN_exp        &lt;dbl&gt; 25.45455, 27.27273, 25.83695, 32.79743, 23.3...
+## $ MÉLENCHON_exp     &lt;dbl&gt; 11.91919, 18.75000, 21.88469, 13.50482, 24.6...
+## $ MACRON_exp        &lt;dbl&gt; 24.040404, 21.022727, 20.644761, 20.471597, ...
+## $ FILLON_exp        &lt;dbl&gt; 22.22222, 19.31818, 16.80099, 21.11468, 18.1...
+## $ LASSALLE_exp      &lt;dbl&gt; 0.4040404, 0.0000000, 0.9299442, 0.6430868, ...
+## $ DUPONT-AIGNAN_exp &lt;dbl&gt; 6.868687, 3.409091, 5.362678, 4.823151, 5.19...
+## $ HAMON_exp         &lt;dbl&gt; 5.8585859, 7.3863636, 5.3316801, 3.9657020, ...
+## $ ASSELINEAU_exp    &lt;dbl&gt; 1.2121212, 0.5681818, 1.1004340, 1.0718114, ...
+## $ POUTOU_exp        &lt;dbl&gt; 0.8080808, 1.1363636, 1.4104154, 1.0718114, ...
+## $ ARTHAUD_exp       &lt;dbl&gt; 0.8080808, 1.1363636, 0.6199628, 0.5359057, ...
+## $ CHEMINADE_exp     &lt;dbl&gt; 0.40404040, 0.00000000, 0.07749535, 0.000000...
+## $ LIBGEO            &lt;chr&gt; "L'Abergement-Clémenciat", "L'Abergement-de-...
+## $ ZE2010            &lt;chr&gt; "8213", "8201", "8201", "8213", "8216", "820...
+## $ LIBZE2010         &lt;chr&gt; "Villefranche-sur-Saône", "Ambérieu-en-Bugey...
+## $ DEP               &lt;chr&gt; "01", "01", "01", "01", "01", "01", "01", "0...
+## $ REG               &lt;chr&gt; "84", "84", "84", "84", "84", "84", "84", "8...
+```
+
+---
+## Exemple
+
+
+```r
+elections %&gt;% 
+  group_by(ZE2010) %&gt;% 
+  summarise_at(vars(Inscrits, Abstentions, Votants, Blancs, Nuls, Exprimés, `LE PEN`:CHEMINADE), funs(sum(.)))
+```
+
+```
+## # A tibble: 305 x 18
+##    ZE2010 Inscrits Abstentions Votants Blancs  Nuls Exprimés `LE PEN`
+##     &lt;chr&gt;    &lt;int&gt;       &lt;int&gt;   &lt;int&gt;  &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;int&gt;
+##  1   0050   121799       21231  100568   2051   918    97599    18901
+##  2   0051    86349       15302   71047   1314   438    69295    15926
+##  3   0052    57124       12084   45040    786   436    43818    11943
+##  4   0053   104365       20689   83676   1719   690    81267    18395
+##  5   0054    35635        6336   29299    506   186    28607     7590
+##  6   0055    76458       14717   61741   1313   550    59878    19641
+##  7   0056  1000098      238264  761834  13718  5552   742564   155891
+##  8   0057   146393       26366  120027   2584  1442   116001    20371
+##  9   0059   367063       72659  294404   4947  1857   287600    87968
+## 10   0060   434913       93470  341443   6785  2343   332315    80238
+## # ... with 295 more rows, and 10 more variables: MÉLENCHON &lt;int&gt;,
+## #   MACRON &lt;int&gt;, FILLON &lt;int&gt;, LASSALLE &lt;int&gt;, `DUPONT-AIGNAN` &lt;int&gt;,
+## #   HAMON &lt;int&gt;, ASSELINEAU &lt;int&gt;, POUTOU &lt;int&gt;, ARTHAUD &lt;int&gt;,
+## #   CHEMINADE &lt;int&gt;
+```
+
+---
+## Exemple
+
+
+```r
+elections %&gt;% 
+  group_by(ZE2010) %&gt;% 
+  summarise_at(vars(Inscrits, Abstentions, Votants, Blancs, Nuls, Exprimés, `LE PEN`:CHEMINADE), funs(sum(.))) %&gt;% 
+  mutate_at(vars(`LE PEN`:CHEMINADE), funs(. / Inscrits * 100))
+```
+
+```
+## # A tibble: 305 x 18
+##    ZE2010 Inscrits Abstentions Votants Blancs  Nuls Exprimés `LE PEN`
+##     &lt;chr&gt;    &lt;int&gt;       &lt;int&gt;   &lt;int&gt;  &lt;int&gt; &lt;int&gt;    &lt;int&gt;    &lt;dbl&gt;
+##  1   0050   121799       21231  100568   2051   918    97599 15.51819
+##  2   0051    86349       15302   71047   1314   438    69295 18.44376
+##  3   0052    57124       12084   45040    786   436    43818 20.90715
+##  4   0053   104365       20689   83676   1719   690    81267 17.62564
+##  5   0054    35635        6336   29299    506   186    28607 21.29928
+##  6   0055    76458       14717   61741   1313   550    59878 25.68861
+##  7   0056  1000098      238264  761834  13718  5552   742564 15.58757
+##  8   0057   146393       26366  120027   2584  1442   116001 13.91528
+##  9   0059   367063       72659  294404   4947  1857   287600 23.96537
+## 10   0060   434913       93470  341443   6785  2343   332315 18.44921
+## # ... with 295 more rows, and 10 more variables: MÉLENCHON &lt;dbl&gt;,
+## #   MACRON &lt;dbl&gt;, FILLON &lt;dbl&gt;, LASSALLE &lt;dbl&gt;, `DUPONT-AIGNAN` &lt;dbl&gt;,
+## #   HAMON &lt;dbl&gt;, ASSELINEAU &lt;dbl&gt;, POUTOU &lt;dbl&gt;, ARTHAUD &lt;dbl&gt;,
+## #   CHEMINADE &lt;dbl&gt;
+```
+
+---
+## À ne pas confondre : binding
+
+Ici il s'agit de juxtaposer des jeux de données 
+
+- `bind_rows`
+- `bind_cols`
+
+---
+## Tips &amp; tricks dplyr
+
+
+```r
+ZE2010 %&gt;% 
+  group_by(LIBZE2010) %&gt;% 
+  summarise(n = n()) %&gt;% 
+  arrange(desc(n))
+```
+
+```
+## # A tibble: 321 x 2
+##                LIBZE2010     n
+##                    &lt;chr&gt; &lt;int&gt;
+##  1              Toulouse   716
+##  2                Amiens   478
+##  3                 Rouen   473
+##  4      Tarbes - Lourdes   451
+##  5                Troyes   449
+##  6                 Dijon   447
+##  7              Besançon   420
+##  8              Bordeaux   408
+##  9                 Nancy   395
+## 10 Roissy - Sud Picardie   393
+## # ... with 311 more rows
+```
+
+---
+## Tips &amp; tricks dplyr
+
+
+
+```r
+ZE2010 %&gt;% 
+  count(LIBZE2010, sort = TRUE)
+```
+
+```
+## # A tibble: 321 x 2
+##                LIBZE2010     n
+##                    &lt;chr&gt; &lt;int&gt;
+##  1              Toulouse   716
+##  2                Amiens   478
+##  3                 Rouen   473
+##  4      Tarbes - Lourdes   451
+##  5                Troyes   449
+##  6                 Dijon   447
+##  7              Besançon   420
+##  8              Bordeaux   408
+##  9                 Nancy   395
+## 10 Roissy - Sud Picardie   393
+## # ... with 311 more rows
+```
+
+---
+## Tips &amp; tricks dplyr
+
+Numéroter les communes par ordre décroissant de vote Le Pen dans le département
+
+
+```r
+elections %&gt;% 
+  group_by(CodeDepartement) %&gt;% 
+  arrange(desc(`LE PEN_exp`)) %&gt;% 
+  mutate(numero = 1:n()) %&gt;% 
+  ungroup %&gt;% 
+  arrange(desc(`LE PEN_exp`)) %&gt;% 
+  select(CodeInsee, Commune, Département, numero, `LE PEN_exp`)
+```
+
+```
+## # A tibble: 35,496 x 5
+##    CodeInsee       Commune         Département numero `LE PEN_exp`
+##        &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt;  &lt;int&gt;        &lt;dbl&gt;
+##  1     52066       Brachay         Haute-Marne      1     83.72093
+##  2     ZP051      Tatakoto Polynésie française      1     74.78261
+##  3     10044  Bétignicourt                Aube      1     74.07407
+##  4     02043       Bagneux               Aisne      1     72.22222
+##  5     ZP041          Rapa Polynésie française      2     70.29703
+##  6     52201 Flammerécourt         Haute-Marne      2     69.04762
+##  7     88298     Ménarmont              Vosges      1     66.66667
+##  8     ZP030        Napuka Polynésie française      3     66.66667
+##  9     08184         Fromy            Ardennes      1     66.07143
+## 10     25552       Sourans               Doubs      1     65.59140
+## # ... with 35,486 more rows
+```
+
+---
+class: inverse, center, middle
+
+# Visualisation de données avec ggplot2
+
+---
+## Le panorama des systèmes graphiques de R
+
+- base graphics : mélange bas niveau/haut niveau, complexe, pas très cohérent, mais rapide et puissant
+
+- lattice : haut niveau, a une grammaire, plus très utilisé
+
+- ggplot2 : haut niveau, grammaire cohérente, très puissant, très largement utilisé et [imité](http://ggplot.yhathq.com/) 
+
+
+---
+## La notion de grammaire de visualisation
+
+- données
+
+- correspondances esthétiques (`aes`thetic mapping)
+
+- couches (`layer`) : `geom` et `stat`
+
+- échelles (`scale`)
+
+- un système de coordonnées (`coord`)
+
+- petits multiples (`facet`)
+
+- un thème (`theme`)
+
+---
+## Un premier exemple simple
+
+- choisir un jeu de données
+
+- faire des graphiques descriptifs (univariés)
+
+- faire des graphiques bivariés
+
+- changer les `aes`
+
+- changer les `geom`
+
+- changer les `theme`
+
+---
+## Les principaux `geom`
+
+- `geom_point`
+
+- `geom_line`
+
+- `geom_text`
+
+- `geom_quantile`
+
+- `geom_histogram`
+
+- `geom_density`
+
+- `geom_smooth`
+
+- `geom_bar`
+
+- et même `geom_map` (et `geom_sf` en conjonction avec le package `sf`)
+
+---
+## Les principaux `aes`thetics
+
+- `x`
+
+- `y`
+
+- `colour`
+
+- `fill`
+
+- `size`
+
+- line width `lwd`
+
+- line type `lty`
+
+---
+class: inverse, center, middle
+
+# Point sur les acquis, les projets, les besoins
+
+---
+class: inverse, center, middle
+
+# Évaluation
+
+https://frama.link/eval_numa_R_2
+
+---
+class: inverse, center, middle
+
+
+# À votre disposition !
+
+joel@datactivi.st
+    </textarea>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {window.dispatchEvent(new Event('resize'));});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
